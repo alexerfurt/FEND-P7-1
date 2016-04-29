@@ -1,0 +1,22 @@
+{
+  "name": "neigborhood app",
+  "authors": [
+    "Alex Erfurt <erfurtalex@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "knockout": "^3.4.0",
+    "jquery": "^2.2.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "fend-p7-1",
+  "version": "1.0.0",
+  "description": "Neighborhood webapp",
+  "main": "index.js",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "bower": "^1.7.9",
+    "gulp": "^3.9.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexerfurt/FEND-P7-1.git"
+  },
+  "author": "Alex Erfurt <erfurtalex@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alexerfurt/FEND-P7-1/issues"
+  },
+  "homepage": "https://github.com/alexerfurt/FEND-P7-1#readme"
+}

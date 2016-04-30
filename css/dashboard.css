@@ -35,10 +35,11 @@ body {
 }
 @media (min-width: 768px) {
   .sidebar {
-    position: fixed;
+    position: absolute;
     top: 51px;
     bottom: 0;
     left: 0;
+	width: 15em;
     z-index: 1000;
     display: block;
     padding: 20px;
@@ -72,12 +73,18 @@ body {
  */
 
 .main {
-  padding: 20px;
+  position: absolute;
+  top: 51px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
 }
 @media (min-width: 768px) {
   .main {
-    padding-right: 40px;
-    padding-left: 40px;
+    left: 15em;
+	padding-right: 10px;
+    padding-left: 10px;
   }
 }
 .main .page-header {

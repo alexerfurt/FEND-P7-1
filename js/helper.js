@@ -1,16 +1,18 @@
-var googleMap = '<div id="map"></div>';
-
 var map;    // declares a global map variable
+
+var googleMaps = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDMBoVkH9JAjs7P0LkVZKAvHTaQt_rcwKk&callback=initMap";
 
 /*
 Start here! initializeMap() is called when page is loaded.
 */
-function initializeMap() {
+function initMap() {
 
   var locations;
 
   var mapOptions = {
-    disableDefaultUI: true
+	  center: {lat: 53.3331718, lng:-6.3309213},
+	  zoom: 8,
+	  disableDefaultUI: true
   };
 
   // This next line makes `map` a new Google Map JavaScript Object and attaches it to
@@ -32,9 +34,9 @@ function initializeMap() {
 
     // iterates through school locations and appends each location to
     // the locations array
-    for (var school in education.schools) {
-      locations.push();
-    }
+    //for (var school in education.schools) {
+      //locations.push();
+    //}
 
     return locations;
   }
@@ -132,7 +134,7 @@ Uncomment the code below when you're ready to implement a Google Map!
 */
 
 // Calls the initializeMap() function when the page loads
-window.addEventListener('load', initializeMap);
+window.addEventListener('load', initMap);
 
 // Vanilla JS way to listen for resizing of the window
 // and adjust map bounds

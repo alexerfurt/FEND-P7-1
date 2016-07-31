@@ -1,119 +1,120 @@
-/*global ko, Router */
-//(function () {
-	
+// Setting up location data
+		
 var initialLocations = [
 	{
 		name: 'Google Dublin',
-		position: {lat: 53.340194, lng: -6.236333}
+		position: {lat: 53.3398681, lng: -6.2362238}
 	},{
 		name: 'Herbstreet',
-		position: {lat: 53.3402679, lng: -6.2412132}
+		position: {lat: 53.3443851, lng: -6.2376548}
 	},{
 		name: 'Cafe H',
-		position: {lat: 53.3419097, lng: -6.2400052}
+		position: {lat: 53.3435446, lng: -6.2388155}
 	},{
 		name: 'The Old Spot',
-		position: {lat: 53.3405771, lng: -6.2413152}
+		position: {lat: 53.3373286, lng: -6.2331933}
 	},{
 		name: 'The Schoolhouse',
-		position: {lat: 53.3405337, lng: -6.2412717}
+		position: {lat: 53.3374152, lng: -6.2394909}
 	},{
 		name: 'The Ferryman',
-		position: {lat: 53.3428969, lng: -6.2419581}
+		position: {lat: 53.3460145, lng: -6.2407869}
 	},{
 		name: 'Mamma Mia',
-		position: {lat: 53.3399306, lng: -6.2422802}
+		position: {lat: 53.339463, lng: -6.2436957}
 	},{
 		name: 'Osteria Lucio',
-		position: {lat: 53.3400085, lng: -6.2405306}
+		position: {lat: 53.340093, lng: -6.239316}
 	},{
 		name: "Paulie's Pizza",
-		position: {lat: 53.3397954, lng: -6.2394496}
+		position: {lat: 53.3374246, lng: -6.2346821}
+	},{
+		name: "The Press Cafe",
+		position: {lat: 53.3351826, lng: -6.2353551}
 	}
 ];
 
 var Location = function (data) {
-	this.name = ko.observable(data.name);
-}
-
-
-var ViewModel = function () {
-	var that = this;
-	
-	this.locationList = ko.observableArray([]);
-	
-	initialLocations.forEach(function(locItem){
-		that.locationList.push( new Location(locItem) );
-	});
-	
-	this.currentLocation = ko.observable( this.locationList()[0] );
-	
-	this.setLocation = function(clickedLocation) {
-		that.currentLocation(clickedLocation);
-	};
-	
+	this.name = data.name;
+	this.position = data.position;
 };
 
-ko.applyBindings(new ViewModel());
-
-var map;
+var map, marker;
 
 function initMap() {
-  var dubLatlng = {lat: 53.340194, lng: -6.236333};
+  var dubLatlng = {lat: 53.3398681, lng: -6.2362238};
 
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 14,
+    zoom: 15,
     center: dubLatlng
   });
 
-  var marker = new google.maps.Marker({
-    position: dubLatlng,
-    map: map,
-    title: 'Click to zoom'
-  });
-
-  function createMapMarker(placeData) {
-
-    // The next lines save location data from the search result object to local variables
-    var lat = placeData.geometry.location.lat();  // latitude from the place service
-    var lon = placeData.geometry.location.lng();  // longitude from the place service
-    var name = placeData.formatted_address;   // name of the place from the place service
-    var bounds = window.mapBounds;            // current boundaries of the map window
-
-    // marker is an object with additional data about the pin for a single location
-    var marker = new google.maps.Marker({
-      map: map,
-      position: placeData.geometry.location,
-      title: name
-    });
-
-    // infoWindows are the little helper windows that open when you click
-    // or hover over a pin on a map. They usually contain more information
-    // about a location.
-    var infoWindow = new google.maps.InfoWindow({
-      content: name
-    });
-
-    // hmmmm, I wonder what this is about...
-    google.maps.event.addListener(marker, 'click', function() {
-      // your code goes here!
-      infoWindow.open(map, marker);
-    });
-
-    // this is where the pin actually gets added to the map.
-    // bounds.extend() takes in a map location object
-    bounds.extend(new google.maps.LatLng(lat, lon));
-    // fit the map to the new marker
-    map.fitBounds(bounds);
-    // center the map
-    map.setCenter(bounds.getCenter());
-  }
-
-  marker.addListener('click', function() {
-    map.setZoom(8);
-    map.setCenter(marker.getPosition());
-  });  
+  ko.applyBindings(new ViewModel());  
 }
+
+// ViewModel Code
+
+var ViewModel = function () {
+	
+	//Initialize Knockout observables
+	var self = this;
+	
+	this.locationList = ko.observableArray([]);
+	this.query = ko.observable('');
+	
+	initialLocations.forEach(function(locItem){
+		self.locationList.push( new Location(locItem) );
+	});
+	
+	var largeInfoWindow = new google.maps.InfoWindow();
+	
+	//Adding a marker to every location in the locationList
+	for (var i=0; i < self.locationList().length; i++) {
+		
+		marker = new google.maps.Marker({
+			map: map,
+			position: self.locationList()[i].position,
+			animation: google.maps.Animation.DROP,
+			title: self.locationList()[i].name,
+			content: '',
+			draggable: true,
+			visible: true,
+		});
+		
+		marker.addListener('click', function() {
+			//populateInfoWindow(this, largeInfoWindow); function not yet defined
+			//toggleBounce(this); function not yet defined
+			//map.setCenter(marker.getPosition());
+		});
+		
+		//Putting the created marker in the locationList
+		self.locationList()[i].marker = marker; 
+		  
+	};
+	
+	this.currentLocation = ko.observable( this.locationList()[0] );
+	
+	this.setMarker = function(clickedLocation) {
+	  // go through each location and make each marker invisible
+	  self.locationList().forEach(function (location){
+	   location.marker.setVisible(false);
+	  }); 
+	  
+	  //set the marker for the clicked location visible
+	  clickedLocation.marker.setVisible(true);
+	  
+	  clickedLocation.marker.setAnimation(google.maps.Animation.BOUNCE);
+	  setTimeout (function () {
+	  	 clickedLocation.marker.setAnimation(null);
+	  }, 1000);
+	  
+	  map.setCenter(clickedLocation.marker.position);
+	  	  
+	};
+};
+
+
+
 
 // Calls the initMap() function when the page loads
 //window.addEventListener('load', initMap);

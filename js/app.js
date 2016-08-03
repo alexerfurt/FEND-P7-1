@@ -1,4 +1,4 @@
-// Setting up location data
+/////// Setting up location data ///////////
 		
 var initialLocations = [
 	{
@@ -44,6 +44,8 @@ var initialLocations = [
 	}
 ];
 
+/////// Global variable and function set-up; loading Google Maps API ///////////
+
 var Location = function (data) {
 	this.name = data.name;
 	this.position = data.position;
@@ -52,24 +54,35 @@ var Location = function (data) {
 
 var map, marker;
 
+// Adding error handling by checking if the Google Maps script has loaded yet before executing initMap function & applying ko bindings
 function initMap() {
-  var dubLatlng = {lat: 53.3405001, lng: -6.2362238};
+	if (typeof google === 'object' && typeof google.maps === 'object') {
+		var dubLatlng = {lat: 53.3405001, lng: -6.2362238};
+		map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 16,
+			center: dubLatlng
+		});
+		
+		ko.applyBindings(new ViewModel());
+		
+	} else {
+		googleError();
+	}
+};
 
-  map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 16,
-    center: dubLatlng
-  });
+// Error handling function for Google Maps API
+function googleError() {
+	var errorMessage = '<div class="location-text"><h3>Ouch! Unfortunately, Google Maps API could not be loaded. Please check your internet connection and reload the page.</h3></div>';
+  document.getElementById('map').innerHTML = errorMessage;
+};
 
-  ko.applyBindings(new ViewModel());  
-}
-
-// ViewModel Code
+/////// ViewModel Code ///////////
 
 var ViewModel = function () {
 	
-	//Initialize first Knockout observables
 	var self = this;
 	
+	//Initialize first Knockout observables
 	this.locationList = ko.observableArray([]);
 	this.filter = ko.observable(); //property to store the filter query, which is an empty string in the beginning so not undefined in computed observable...
 	
@@ -95,11 +108,10 @@ var ViewModel = function () {
 		
 		marker.addListener('click', function() {
 			createInfoWindow(this, infoWindow);
-			//toggleBounce(this); function not yet defined
-			//map.setCenter(marker.getPosition());
+
 		});
 		
-		//Putting the created marker in the locationList
+		//Putting the created marker into locationList array
 		self.locationList()[i].marker = marker; 
 		  
 	};
@@ -150,13 +162,6 @@ var ViewModel = function () {
 	}, this);
 	
 	this.setMarker = function(clickedLocation) {
-	  // go through each location and make each marker invisible
-	  //self.locationList().forEach(function (location){
-	   //location.marker.setVisible(false);
-	  //}); 
-	  
-	  //set the marker for the clicked location visible
-	  //clickedLocation.marker.setVisible(true);
 	  
 	  clickedLocation.marker.setAnimation(google.maps.Animation.BOUNCE);
 	  

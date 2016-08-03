@@ -130,6 +130,16 @@ function initMap() {
   ko.applyBindings(new ViewModel());  
 }
 
+this.setLocation = function(clickedLocation) {
+	
+  self.locationList().forEach(function (location){
+   location.marker.setVisible(false);
+  });
+  
+  self.currentLocation(clickedLocation);
+  
+  clickedLocation.marker.setVisible(true);
+};
 
 // Calls the initMap() function when the page loads
 //window.addEventListener('load', initMap);

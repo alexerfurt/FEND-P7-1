@@ -128,8 +128,8 @@ var ViewModel = function () {
 		if (infoWindow.marker != location.marker) {
 			infoWindow.marker = location.marker;
 			console.log(location);
-			infoWindow.setContent('<div>' + '<h4>' + location.marker.title + '</h4>'  +  location.marker.content + '</br>' + 'Phone:  ' + location.businesses.phone + '</br>'+ '</br>'+ 'Yelp-Review:  '
-			+ location.businesses.rating + '   ' + ' <img src = "' + location.businesses.rating_img_url  + '"/>' + ' ' + location.businesses.review_count + ' Reviews' +'</div>');
+			infoWindow.setContent('<div>' + '<h4>' + location.marker.title + '</h4>'  +  location.marker.content + '</br>' + 'Phone:  ' + location.businesses.phone + '</br>'+ '</br>'+ 'Yelp-Rating:  '
+			+ location.businesses.rating + '   ' + ' <img src = "' + location.businesses.rating_img_url  + '"/>' + ' ' + location.businesses.review_count + ' Reviews' + '</br>'+ '</br>'+ 'Yelp-Review:  ' + location.businesses.reviews[0].excerpt +'</div>');
 			infoWindow.open(map, location.marker);
 	  	  	setTimeout (function () {
 	  	  	 	infoWindow.close(map, location.marker);

@@ -7,8 +7,6 @@ Check out on: http://alexerfurt.github.io/dist/index.html
 NPM and Bower has been used as a package manager, Bootstraps "dashboard" theme as a front-end template and Gulp for build automation. The following gulp-plugins will be needed to reconstruct files within the 'dist' directory out of the production files within the 'src' folder:
 
 * gulp-uglify
-* gulp-inline-css
-* gulp-image-optimization
 * gulp-htmlmin
 * gulp-jshint
 * gulp-cssnano

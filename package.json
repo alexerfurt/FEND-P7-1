@@ -14,12 +14,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alexerfurt/FEND-P7-1.git"
+    "url": "git+https://github.com/alexerfurt/alexerfurt.github.io.git"
   },
   "author": "Alex Erfurt <erfurtalex@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/alexerfurt/FEND-P7-1/issues"
+    "url": "https://github.com/alexerfurt/alexerfurt.github.io/issues"
   },
-  "homepage": "https://github.com/alexerfurt/FEND-P7-1#readme"
+  "homepage": "https://github.com/alexerfurt/alexerfurt.github.io#readme"
 }

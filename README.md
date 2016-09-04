@@ -9,7 +9,8 @@ This app shows some of my favorite places in Dublins Grand Canal area. App and d
 
 ### Getting started
 
-NPM and Bower has been used as a package manager, Bootstraps "dashboard" theme as a front-end template and Gulp for build automation. The following gulp-plugins will be needed to reconstruct files within the 'dist' directory out of the production files within the 'src' folder:
+NPM and Bower has been used as a package manager, Bootstraps "dashboard" theme as a front-end template and Gulp for build automation. You can install all these packages by using the "npm install..." command via terminal (MAC) or equivalent consoles, i.e. "npm install", "npm install bower" & "npm install gulp". For more details, please read the official npm documentation to install packages via npm (https://docs.npmjs.com/getting-started/installing-npm-packages-locally). Further, you can download the "Bootstrap Dashboard" template here: https://getbootstrap.com/getting-started/#examples
+The following Gulp-plugins will be needed to reconstruct files within the 'dist' directory out of the production files within the 'src' folder:
 
 * gulp-uglify
 * gulp-htmlmin
@@ -17,7 +18,7 @@ NPM and Bower has been used as a package manager, Bootstraps "dashboard" theme a
 * gulp-cssnano
 * gulp-notify
 
-See also package.json file for all dependencies. All of them can be installed using the "npm install --save-dev <GULP_PLUGIN>" command via terminal (MAC) or equivalent consoles.
+See also package.json file for all dependencies. All of them can be installed using the "npm install --save-dev <GULP_PLUGIN>" command via terminal (MAC) or equivalent consoles. Start the app by opening "dist/index.html".
 
 #### Citation and used resources
 
@@ -26,7 +27,7 @@ The core application code was written by myself. Nevertheless I would not have m
 * Udacity Classes & Materials
 * Udacity's Discussion Forum (https://discussions.udacity.com/c/nd001-neighborhood-map-project)
 * Github and repos from other developers
-* Google Developers & Map API Documentation (https://developers.google.com/maps/documentation/javascript/tutorial)
+* Google Developers & Maps API Documentation (https://developers.google.com/maps/documentation/javascript/tutorial)
 * Knockout Documentation (http://knockoutjs.com/documentation/introduction.html)
 * Yelp API Documentation (https://www.yelp.ie/developers/documentation/v2/overview & https://www.yelp.ie/developers/documentation/v2/authentication)
 * Bootstrap Documentation (http://getbootstrap.com/getting-started/#examples)

@@ -1,5 +1,5 @@
 /////// Setting up global variables and location data ///////////
-var map, marker;
+var map, createInfoWindow, infowindow;
 
 var initialLocations = [{
     name: 'Herbstreet',
@@ -75,11 +75,85 @@ var initialLocations = [{
     yelpID: "press-cafe-dublin"
 }];
 
-var Location = function(data) {
+var Location = function(data) { //Location class
+    var that = this;
     this.name = data.name;
     this.position = data.position;
     this.address = data.address;
     this.yelpID = data.yelpID;
+    this.marker = new google.maps.Marker({ //Adding a marker to Location class
+        map: map,
+        position: this.position,
+        animation: google.maps.Animation.DROP,
+        title: this.name,
+        content: this.address,
+        draggable: true,
+        visible: true,
+    });
+
+    //Adding event listener to each marker
+    this.marker.addListener('click', function() {
+        Location.prototype.setMarker(that);
+        Location.prototype.getYelpData(that);
+    });
+};
+
+Location.prototype.setMarker = function(loc) { //Adding function for bounce animation of pins when clicked
+    var clickedLocation = loc;
+    clickedLocation.marker.setAnimation(google.maps.Animation.BOUNCE);
+
+    setTimeout(function() {
+        clickedLocation.marker.setAnimation(null);
+    }, 750);
+};
+
+Location.prototype.getYelpData = function(loc) { //Adding function to call Yelp API for some location data
+
+    var clickedLocation = loc;
+
+    var YELP_KEY = "QgKzDi6crlpMCdWqbO6dFA",
+        YELP_TOKEN = "3RF38ZKFoQAKGL0G1K2VwkFRZ1DAz-mk",
+        YELP_KEY_SECRET = "f8fSNbZvOseIXYlrsqbKqPlgYqo",
+        YELP_TOKEN_SECRET = "WwALE3bHBsJNq3uRiX_TAPMOg9U",
+        business_id = clickedLocation.yelpID;
+
+    function nonce_generate() {
+        return (Math.floor(Math.random() * 1e12).toString());
+    }
+
+    var yelp_url = 'http://api.yelp.com/v2/business/' + business_id;
+
+    var parameters = {
+        oauth_consumer_key: YELP_KEY,
+        oauth_token: YELP_TOKEN,
+        oauth_nonce: nonce_generate(),
+        oauth_timestamp: Math.floor(Date.now() / 1000),
+        oauth_signature_method: 'HMAC-SHA1',
+        oauth_version: '1.0',
+        callback: 'cb',
+        id: business_id
+    };
+
+    var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters,
+        YELP_KEY_SECRET, YELP_TOKEN_SECRET);
+    parameters.oauth_signature = encodedSignature;
+
+    $.ajax({
+            url: yelp_url,
+            data: parameters,
+            cache: true,
+            dataType: 'jsonp',
+            jsonpCallback: 'cb',
+            success: function(results) {
+                //Putting results into the businesses object of locationListArray.		          
+                clickedLocation.businesses = results;
+                //Function to create an infowindow is called which gets now the clicked location with all the necessary information
+                createInfoWindow(clickedLocation, infoWindow);
+            }
+        })
+        .fail(function() { // Sends error message to the user
+            alert("An error occurred: Yelp API call failed! Sorry about that. Please check your internet connection or try it again later.");
+        });
 };
 
 /////// Google Maps API ///////////
@@ -117,146 +191,44 @@ var ViewModel = function() {
 
     //Initialize first Knockout observables
     this.locationList = ko.observableArray([]);
-    this.filter = ko.observable(); //property to store the filter query, which is an empty string in the beginning so not undefined in computed observable...
+    this.filter = ko.observable(''); //property to store the filter query, which is an empty string in the beginning so not undefined in computed observable...
 
     // Filling locationList observable Array with the model (location data)
     initialLocations.forEach(function(locItem) {
         self.locationList.push(new Location(locItem));
     });
 
-    var infoWindow = new google.maps.InfoWindow();
-
-    //Adding a marker to every location in the locationList. EDIT: Changed initial for loop into forEach-method pass each location item into the function
-    self.locationList().forEach(function(item) {
-
-        marker = new google.maps.Marker({
-            map: map,
-            position: item.position,
-            animation: google.maps.Animation.DROP,
-            title: item.name,
-            content: item.address,
-            draggable: true,
-            visible: true,
-        });
-
-        //Adding event listener to each marker
-        marker.addListener('click', function() {
-            console.log(item);
-            getYelpData(item);
-        });
-
-        //Putting the created marker into locationList array
-        item.marker = marker;
-
-    });
+    infoWindow = new google.maps.InfoWindow();
 
     //Adding function that creates an Infowindow everytime the respective marker is clicked or its locations on the list. Infowindo includes name and address data from the model as well as phone number and customer ratings from the Yelp API
-    var createInfoWindow = function(location, infoWindow) {
+    createInfoWindow = function(location, infoWindow) {
         if (infoWindow.marker != location.marker) {
             infoWindow.marker = location.marker;
-            console.log(location);
             infoWindow.setContent('<div>' + '<h4>' + location.marker.title + '</h4>' + location.marker.content + '</br>' + 'Phone:  ' + location.businesses.phone + '</br>' + '</br>' + 'Yelp-Rating:  ' +
                 location.businesses.rating + '   ' + ' <img src = "' + location.businesses.rating_img_url + '"/>' + ' ' + location.businesses.review_count + ' Reviews' + '</br>' + '</br>' + 'Yelp-Review:  ' + location.businesses.reviews[0].excerpt + '</div>');
             infoWindow.open(map, location.marker);
-            setTimeout(function() {
-                infoWindow.close(map, location.marker);
-                infoWindow.marker = null;
-            }, 4000);
-
             infoWindow.addListener('closeclick', function() {
                 infoWindow.marker = null;
             });
         }
     };
 
-    this.currentLocation = ko.observable(this.locationList()[0]);
+    this.currentLocation = function() {
+        Location.prototype.setMarker();
+        Location.prototype.getYelpData();
+    };
 
     //Adding filter functionality
     this.filteredList = ko.computed(function() { //new location observable that includes only those locations that match with the filter query
-        // also shows only markers of locations that are currently in the list
-        var filter = this.filter();
-        if (!filter) {
-            //if there is no filter, then return the whole list
-            return ko.utils.arrayFilter(this.locationList(), function(item) {
-                item.marker.setVisible(true);
-                return true;
-            });
-        } else {
+        // uses arrayFilter to shorten the locationList and show only markers for the shortend list
+        var filter = this.filter().toLowerCase();
 
-            //if there is a filter then use arrayFilter to shorten the locationList and show only markers for the shortend list
-            return ko.utils.arrayFilter(this.locationList(), function(item) {
-                if (item.name.toLowerCase().indexOf(filter) === 0 || item.name.indexOf(filter) === 0) {
-                    item.marker.setVisible(true);
-                    return true;
-                } else {
-                    item.marker.setVisible(false);
-                    return false;
-                }
-            });
-        }
+        return ko.utils.arrayFilter(this.locationList(), function(item) {
+            // check if string is present, will be true or false
+            var matches = item.name.toLowerCase().indexOf(filter) === 0;
+            item.marker.setVisible(matches);
+            return matches;
+        });
     }, this);
-
-    this.setMarker = function(clickedLocation) {
-
-        clickedLocation.marker.setAnimation(google.maps.Animation.BOUNCE);
-
-        setTimeout(function() {
-            clickedLocation.marker.setAnimation(null);
-        }, 750);
-
-        //map.setCenter(clickedLocation.marker.position);
-        google.maps.event.trigger(clickedLocation.marker, 'click');
-
-    };
-
-    function getYelpData(currentLoc) {
-
-        var YELP_KEY = "QgKzDi6crlpMCdWqbO6dFA",
-            YELP_TOKEN = "3RF38ZKFoQAKGL0G1K2VwkFRZ1DAz-mk",
-            YELP_KEY_SECRET = "f8fSNbZvOseIXYlrsqbKqPlgYqo",
-            YELP_TOKEN_SECRET = "WwALE3bHBsJNq3uRiX_TAPMOg9U",
-            business_id = currentLoc.yelpID;
-
-        function nonce_generate() {
-            return (Math.floor(Math.random() * 1e12).toString());
-        }
-
-        var yelp_url = 'http://api.yelp.com/v2/business/' + business_id;
-
-        var parameters = {
-            oauth_consumer_key: YELP_KEY,
-            oauth_token: YELP_TOKEN,
-            oauth_nonce: nonce_generate(),
-            oauth_timestamp: Math.floor(Date.now() / 1000),
-            oauth_signature_method: 'HMAC-SHA1',
-            oauth_version: '1.0',
-            callback: 'cb',
-            id: business_id
-        };
-
-        var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters,
-            YELP_KEY_SECRET, YELP_TOKEN_SECRET);
-        parameters.oauth_signature = encodedSignature;
-
-        $.ajax({
-                url: yelp_url,
-                data: parameters,
-                cache: true,
-                dataType: 'jsonp',
-                jsonpCallback: 'cb',
-                success: function(results) {
-                    //Putting results into the businesses object of locationListArray.		          
-                    currentLoc.businesses = results;
-                    //Function to create an infowindow is called which gets now the clicked location with all the necessary information
-                    createInfoWindow(currentLoc, infoWindow);
-                },
-                error: function(status) { // Send error message to user
-                    alert("An error occurred: " + status + "\nError: Yelp API call failed! Sorry about that. Please try it again later.");
-                }
-            })
-            .fail(function() { // Sends error message to the console for better debugging
-                console.log("Data could not be retrieved from Yelp API");
-            });
-    }
 
 };
